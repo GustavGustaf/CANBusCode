@@ -46,6 +46,9 @@ void loop()
 //Rpm.
     Serial.println();
     if(rxId == 2365583432){ //Extended ID: 0x0CFFF048
+      Serial.print("RPM");
+      double RPM=(rxBuf[1]*256+rxBuf[0]);
+      Serial.print(RPM);
       Serial.print("Throttle Percentage");
       double percentage=(rxBuf[3]*256+rxBuf[2])/10.0;
       Serial.print(percentage);
@@ -53,17 +56,32 @@ void loop()
     Serial.println();
 
       if(rxId == 2365583688){ //Extended ID: 0x0CFFF148
-      Serial.print("Barometer");
-      double barometer=(rxBuf[1]*256+rxBuf[0])/100.0;
-      Serial.print(barometer);
+      Serial.print("MAP");
+      double MAP=(rxBuf[3]*256+rxBuf[2])/100.0;
+      Serial.print(MAP);
+      Serial.print("Lambda");
+      double lambda=(rxBuf[5]*256+rxBuf[4])/100.0;
+      Serial.print(lambda);
       }
     Serial.println();
+      if(rxId == 2365583944){ //Extended ID: 0CFFF248
+        Serial.print("OilTemp");
+        double Oiltemp=(rxBuf[1]*256+rxBuf[0])/1000.0;
+        Serial.print(Oiltemp);
+      }
+    Serial.println();
+    
+      if(rxId == 2365584456){ //Extended ID: 0CFFF448
+        Serial.print("Frequency2");
+        double Frequency2=(rxBuf[3]*256+rxBuf[2])/1000.0;
+        Serial.print(Frequency2);
+      }
+      Serial.println();
       if(rxId == 2365584712){ //Extended ID: 0x0CFFF548
         Serial.print("CoolantTemp");
         double coolanttemp=(rxBuf[5]*256+rxBuf[4])/10.0;
         Serial.print(coolanttemp);
       }
-    Serial.println();
   }
 }
 
