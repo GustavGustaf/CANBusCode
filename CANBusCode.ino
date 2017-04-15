@@ -28,7 +28,7 @@ void setup()
   Serial.begin(9600);
   
   // Initialize MCP2515 running at 16MHz with a baudrate of 250kb/s and the masks and filters disabled.
-  if(CAN0.begin(MCP_STDEXT, CAN_250KBPS, MCP_16MHZ) == CAN_OK) //Changed from MCP_ANY to MCP_STDEXT
+  if(CAN0.begin(MCP_STDEXT, CAN_500KBPS, MCP_16MHZ) == CAN_OK) //Changed from MCP_ANY to MCP_STDEXT
     Serial.println("MCP2515 Initialized Successfully!");
   else
     Serial.println("Error Initializing MCP2515...");
@@ -67,11 +67,18 @@ void loop()
       coolantTemp=(((rxBuf[5]*256+rxBuf[4])/10.0)+1000)/2000; //Coolant temperature
     }
     else {
-      sprintf(msgString, "rxId: %.8lX not recognized", rxId);
-      Serial.println(msgString);
+      //Use the following to test only
+      //sprintf(msgString, "rxId: %.8lX not recognized", rxId);
+      //Serial.println(msgString);
     }
 
-    outString=scaleIt(rpm)+scaleIt(tps)+scaleIt(mabsp)+scaleIt(lambda)+scaleIt(oilTemp)+scaleIt(frequency2)+scaleIt(coolantTemp);
+    outString=scaleIt(rpm);
+    outString+=scaleIt(tps);
+    outString+=scaleIt(mabsp);
+    outString+=scaleIt(lambda);
+    outString+=scaleIt(oilTemp);
+    outString+=scaleIt(frequency2);
+    outString+=scaleIt(coolantTemp);
     Serial.println(outString);
   }
 }
