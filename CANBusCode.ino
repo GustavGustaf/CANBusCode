@@ -66,7 +66,7 @@ void loop()
     CAN0.readMsgBuf(&rxId, &len, rxBuf);      // Read data: len = data length, buf = data byte(s)
     if(rxId == 2365583432){ //Extended ID: 0x0CFFF048
       rpm=readValue(1,0, 1.0)/30000.0; //Rotations per minute
-      tps=readValue(3,2, 10.0)/100; //Throttle position as a percentage
+      tps=readValue(3,2, 10.0)/100.0; //Throttle position as a percentage
     }
     else if(rxId == 2365583688){ //Extended ID: 0x0CFFF148
       mabsp=readValue(3,2,100.0)/300.0; //Manifold absolute pressure
