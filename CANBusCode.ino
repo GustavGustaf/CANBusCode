@@ -23,8 +23,19 @@ double oilTemp=0;
 double frequency2=0;
 double coolantTemp=0;
 
-const int loopMax=3; //This was determined experimentally.
+const int loopMax=10; //This was determined experimentally.
 int loopCounter=0;
+
+//Modified function from the PE3 series manual to give actual number reading in the units column
+double readValue(int hByte, int lByte, double resolutionMultiplier){//resolution multiplier is a multiple of 10 to get the Resolution per bit to 1
+  double num=rxBuf[hByte]*256+rxBuf[lByte];
+  if (num>32767){
+    num-=65536;
+  }
+  num=num/resolutionMultiplier;
+  return num;
+}
+
 
 void setup()
 {
@@ -54,21 +65,21 @@ void loop()
     //All readings are turned into a percentage of their max values.
     CAN0.readMsgBuf(&rxId, &len, rxBuf);      // Read data: len = data length, buf = data byte(s)
     if(rxId == 2365583432){ //Extended ID: 0x0CFFF048
-      rpm=(rxBuf[1]*256+rxBuf[0])/30000.0; //Rotations per minute
-      tps=((rxBuf[3]*256+rxBuf[2])/10.0)/100; //Throttle position as a percentage
+      rpm=readValue(1,0, 1.0)/30000.0; //Rotations per minute
+      tps=readValue(3,2, 10.0)/100; //Throttle position as a percentage
     }
     else if(rxId == 2365583688){ //Extended ID: 0x0CFFF148
-      mabsp=((rxBuf[3]*256+rxBuf[2])/100.0)/300; //Manifold absolute pressure
-      lambda=((rxBuf[5]*256+rxBuf[4])/100.0)/10; //Oxygen
+      mabsp=readValue(3,2,100.0)/300; //Manifold absolute pressure
+      lambda=readValue(5,4, 1000.0)/10; //Oxygen. Datasheet is wrong about the resolution. Actual value found in pe3Monitor
     }
     else if(rxId == 2365583944){ //Extended ID: 0CFFF248
-      oilTemp=((rxBuf[1]*256+rxBuf[0])/1000.0)/5; //Oil temperature from Analog Input #1
+      oilTemp=readValue(1,0,1000.0)/5.0; //Oil temperature from Analog Input #1
     }
     else if(rxId == 2365584456){ //Extended ID: 0CFFF448
-      frequency2=((rxBuf[3]*256+rxBuf[2])/10.0)/6000; //Reading from Frequency2
+      frequency2=readValue(3,2,10.0)/6000.0;//Reading from Frequency2
     }
     else if(rxId == 2365584712){ //Extended ID: 0x0CFFF548
-      coolantTemp=(((rxBuf[5]*256+rxBuf[4])/10.0)+1000)/2000; //Coolant temperature
+      coolantTemp=(readValue(5,4,10.0)+1000)/2000.0;//Coolant temperature
     }
     else {
       //Use the following to test only
