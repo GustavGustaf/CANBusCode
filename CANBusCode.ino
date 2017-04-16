@@ -69,8 +69,8 @@ void loop()
       tps=readValue(3,2, 10.0)/100; //Throttle position as a percentage
     }
     else if(rxId == 2365583688){ //Extended ID: 0x0CFFF148
-      mabsp=readValue(3,2,100.0)/300; //Manifold absolute pressure
-      lambda=readValue(5,4, 1000.0)/10; //Oxygen. Datasheet is wrong about the resolution. Actual value found in pe3Monitor
+      mabsp=readValue(3,2,100.0)/300.0; //Manifold absolute pressure
+      lambda=readValue(5,4, 1000.0)/10.0; //Oxygen. Datasheet is wrong about the resolution. Actual value found in pe3Monitor
     }
     else if(rxId == 2365583944){ //Extended ID: 0CFFF248
       oilTemp=readValue(1,0,1000.0)/5.0; //Oil temperature from Analog Input #1
