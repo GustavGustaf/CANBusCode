@@ -23,6 +23,9 @@ double oilTemp=0;
 double frequency2=0;
 double coolantTemp=0;
 
+const int loopMax=3; //This was determined experimentally.
+int loopCounter=0;
+
 void setup()
 {
   Serial.begin(9600);
@@ -30,7 +33,7 @@ void setup()
   // Initialize MCP2515 running at 16MHz with a baudrate of 250kb/s and the masks and filters disabled.
   if(CAN0.begin(MCP_STDEXT, CAN_500KBPS, MCP_16MHZ) == CAN_OK) //Changed from MCP_ANY to MCP_STDEXT
     //Serial.println("MCP2515 Initialized Successfully!");
-    rpm=0;
+    rpm=0; //Put in to get rid of the message but still be valid code.
   else
     Serial.println("Error Initializing MCP2515...");
   
@@ -44,7 +47,6 @@ void setup()
 
 void loop()
 {
-  delay(100); //A delay of 500 definitely works, but it's too slow. Instead, make a loop that only sends an output every 10th loop or something.
   if(!digitalRead(CAN0_INT))                         // If CAN0_INT pin is low, read receive buffer
   {
     String outString=""; //This will store the fixed-length values to be sent to LabView
@@ -81,10 +83,16 @@ void loop()
     outString+=scaleIt(oilTemp);
     outString+=scaleIt(frequency2);
     outString+=scaleIt(coolantTemp);
-    //Testing
-    char outArray[22];//as 1 char space for null is also required
-    strcpy(outArray, outString.c_str());
-    Serial.write(outArray, 21);
-    //Serial.println(outString);
+    //Because the Mega needs some time to receive each byte individually, this loop was created to allow the values to update but delay the sending.
+    if (loopCounter==loopMax){
+    char outArray[22]; //This number is 3 bytes for each measurement + 1 for the null character.
+    strcpy(outArray, outString.c_str()); //This line converts the string to an array for transmission.
+    Serial.write(outArray, 21); //This line outputs each charater individually to be received by the Mega.
+    loopCounter=0;
+    }
+    else{
+      loopCounter+=1;
+    }
+//    Serial.println(outString); //Used for the same testing above.
   }
 }
